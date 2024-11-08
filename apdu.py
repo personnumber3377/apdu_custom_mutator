@@ -36,7 +36,8 @@ def bytes_or_nothing(thing): # Checks for None
 
 def deserialize_to_obj(message_bytes: bytes) -> APDUMsg: # This deserializes a single message to a APDUMsg object.
 	# def __init__(self, CLA, CMD, OP, cmd_data):
-
+	if len(message_bytes) < 2: # Invalid bullshit.
+		return None
 	header = message_bytes[:3] # Three first bytes.
 	cmd_data = message_bytes[3:] # Then the rest is just data for the command.
 	#print("header == "+str(header))

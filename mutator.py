@@ -14,6 +14,8 @@ def mutate_contents(databytes: bytes) -> bytes: # Mutates bytes
 	messages = []
 	for chunk in chunks:
 		msg = deserialize_to_obj(chunk)
+		if msg == None:
+			continue # Skip adding invalid bullshit.
 		messages.append(msg) # Add that message thing.
 	# Ok, so now we have the messages in "messages". Select a mutation strategy and mutate.
 	mutate_messages(messages) # Mutate the message objects...
