@@ -8,7 +8,10 @@ def test_mutator():
 	fh = open("input.bin", "rb") # Read the file "input.bin"
 	data = fh.read() # Read input data.
 	fh.close()
-	print(try_parse_input(data)) # Try to parse the chunks from the input file.
+	res = try_parse_input(data)
+	#print(res)
+	for chunk in res: # Try to parse the chunks from the input file.
+		print(chunk)
 	return
 
 
