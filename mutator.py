@@ -19,6 +19,9 @@ def mutate_contents(databytes: bytes) -> bytes: # Mutates bytes
 		messages.append(msg) # Add that message thing.
 	# Ok, so now we have the messages in "messages". Select a mutation strategy and mutate.
 	mutate_messages(messages) # Mutate the message objects...
+	#for msg in messages:
+	#	#print("Checking...")
+	#	assert msg.CLA == 0x80 # Poopoo 
 	# Serialize back to bytes
 	thing = bytes([])
 	for msg in messages:
