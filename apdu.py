@@ -16,7 +16,7 @@ class APDUMsg:
 		must_be_byte(CLA)
 		must_be_byte(CMD)
 		must_be_byte(OP)
-		assert CLA == 0x80 # CLA must always be 0x80
+		#assert CLA == 0x80 # CLA must always be 0x80
 
 		self.CLA = CLA
 		self.CMD = CMD
@@ -62,7 +62,9 @@ def serialize_with_length(msg: APDUMsg) -> bytes:
 	msg_bytes = serialize_to_bytes(msg)
 	if len(msg_bytes) > 255:
 		print("FUUUUUCCCKKKK")
+		print(len(msg_bytes))
 		exit(1)
+	assert len(bytes([len(msg_bytes)])) == 1 # We should have 255 max stuff.
 	return bytes([len(msg_bytes)]) + msg_bytes # Just something like this maybe???
 
 
