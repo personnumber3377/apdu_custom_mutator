@@ -5,9 +5,18 @@ from apdu import *
 from generic_mutator.generic_mutator_bytes import * # For "mutate"
 from message_mutator import *
 
+TESTING = False
+
 def mutate_contents(databytes: bytes) -> bytes: # Mutates bytes
+	if len(databytes) == 0:
+		return bytes()
 	chunks = try_parse_input(databytes)
 	if chunks == None: # The original data passed to this function was invalid. Return a generic mutation
+		if TESTING:
+			fh = open("fuck.bin", "wb") # Read the file "input.bin"
+			fh.write(databytes) # Read input data.
+			fh.close()
+			assert False
 		return mutate_generic(databytes) # Just use the generic mutator...
 	# Now we should get the same file input back if we deserialize with length.
 	thing = bytes([])
@@ -15,6 +24,8 @@ def mutate_contents(databytes: bytes) -> bytes: # Mutates bytes
 	for chunk in chunks:
 		msg = deserialize_to_obj(chunk)
 		if msg == None:
+			if TESTING:
+				assert False
 			continue # Skip adding invalid bullshit.
 		messages.append(msg) # Add that message thing.
 	# Ok, so now we have the messages in "messages". Select a mutation strategy and mutate.
@@ -81,6 +92,8 @@ def test_serializing():
 
 
 def test_mutating():
+	global TESTING
+	TESTING = True
 	fh = open("paska.txt", "rb") # Read the file "input.bin"
 	data = fh.read() # Read input data.
 	fh.close()
@@ -90,7 +103,10 @@ def test_mutating():
 		fh.write(data) # Read input data.
 		fh.close()
 		data = mutate_contents(data)
-		print(i)
+		# print(i)
+	fh = open("output.bin", "wb") # Read the file "input.bin"
+	fh.write(data) # Read input data.
+	fh.close()
 	print("Mutated data: "+str(data))
 
 	print("test_mutating passed!!!")

@@ -9,7 +9,136 @@ import ins
 MAX_COPY_AMOUNT = 10 # Just a boatload of shit.
 MAX_DELETE_AMOUNT = 10
 
+
+
+
+
+'''
+
+/*
+ * Advance blockchain state.
+ *
+ * @arg[in] rx number of received bytes from the Host
+ * @ret     number of transmited bytes to the host
+ */
+unsigned int bc_advance(volatile unsigned int rx) {
+    uint8_t op = APDU_OP();
+
+    // Check we are getting expected OP
+    if (op != OP_ADVANCE_INIT && op != expected_state) {
+        FAIL(PROT_INVALID);
+    }
+
+    // Check we are getting the expected amount of data
+    if (op == OP_ADVANCE_INIT && APDU_DATA_SIZE(rx) != sizeof(uint32_t)) {
+        FAIL(PROT_INVALID);
+    }
+    if ((op == OP_ADVANCE_HEADER_META || op == OP_ADVANCE_BROTHER_META) &&
+        APDU_DATA_SIZE(rx) !=
+            (sizeof(block.mm_rlp_len) + sizeof(block.cb_txn_hash))) {
+        FAIL(PROT_INVALID);
+    }
+    if (op == OP_ADVANCE_BROTHER_LIST_META &&
+        APDU_DATA_SIZE(rx) != sizeof(block.brother_count)) {
+        FAIL(PROT_INVALID);
+    }
+    if (op == OP_ADVANCE_HEADER_CHUNK || op == OP_ADVANCE_BROTHER_CHUNK) {
+        uint16_t expected_txlen =
+            block.size > 0 ? MIN(block.size - block.recv, MAX_CHUNK_SIZE)
+                           : MAX_CHUNK_SIZE;
+        if (APDU_DATA_SIZE(rx) != expected_txlen) {
+            FAIL(PROT_INVALID);
+        }
+    }
+
+
+// Operation selectors
+typedef enum {
+    OP_ADVANCE_INIT = 0x02,
+    OP_ADVANCE_HEADER_META = 0x03,
+    OP_ADVANCE_HEADER_CHUNK = 0x04,
+    OP_ADVANCE_PARTIAL = 0x05,
+    OP_ADVANCE_SUCCESS = 0x06,
+    OP_ADVANCE_BROTHER_LIST_META = 0x07,
+    OP_ADVANCE_BROTHER_META = 0x08,
+    OP_ADVANCE_BROTHER_CHUNK = 0x09,
+} op_code_advance_t;
+
+
+'''
+
+
+def mutate_data_fixed_size(msg, size) -> None: # This mutates the data field of the message "msg" to a fixed size. This is useful for messages which take a fixed length input and rejects all other input lengths.
+
+	dat_thing = copy.deepcopy(msg.data)
+	prev_data = copy.deepcopy(dat_thing)
+	dat_thing = dat_thing * 1 # Just multiply by a hundred.
+	for _ in range(100):
+		dat_thing = bytes(mutate_generic(bytes(dat_thing[:size])))
+	if len(dat_thing) <= size:
+		dat_thing = dat_thing * 100
+
+	if len(dat_thing) <= size: # Basically a safeguard
+		dat = bytes([0x41]*size) # Just return a shit
+		msg.data = dat
+		return
+
+	assert len(dat_thing) >= size # Should be larger or the same size.
+
+
+
+	msg.data = dat_thing[:size] # Cutoff at size...
+	if prev_data == msg.data:
+		
+		dat = bytes([0x41]*size) # Just return a shit
+		msg.data = dat
+		return 
+		#print("FUCK!"*1000)
+		#exit(1)
+	return
+
+def mutate_bc_advance(messages): # Mutates the bc_advance shit
+	# INS_ADVANCE
+	# data_sizes = {}
+	mutated = False
+	for i in range(len(messages)):
+		if messages[i].CMD == ins.INS_ADVANCE: # Custom mutator.
+			# now the data sizes are in data_sizes_for_ops
+			OP_THING = messages[i].OP
+			if OP_THING in ins.data_sizes_for_ops:
+				data_size = ins.data_sizes_for_ops[OP_THING]
+			else:
+				messages[i].OP = random.choice(ins.advance_ops) # Select a random operation thing.
+				assert messages[i].OP in ins.data_sizes_for_ops # Sanity checking
+				data_size = ins.data_sizes_for_ops[messages[i].OP]
+
+			data_before = copy.deepcopy(messages[i].data)
+			#print("Mutating the bc shit!!!"*10000)
+			#assert False
+			mutate_data_fixed_size(messages[i], data_size)
+
+			new_data = messages[i].data
+			#print("previous_data: "+str(data_before)+" "*10+"new_data: "+str(new_data))
+			mutated = True
+			assert data_before != new_data # Should change.
+
+
+	return mutated # Done
+
+
+
+
 def mutate_messages(messages: list): # Mutates the messages in-place.
+
+	# These next lines are for message specific mutations only.
+
+	# Check for obvious overrides here before continuing with generic fuzzing strategies.
+	if random.randrange(2) == 1: # 50/50 chance
+		if mutate_bc_advance(messages): # Message specific mutations. If we mutate here, don't bother mutating the other shit.
+			return
+
+
+	# These rest are generic mutations strategies which can be used on any message.
 
 	mut_strat = random.randrange(6) # Generate a random integer from 0 to 5 inclusive.
 
