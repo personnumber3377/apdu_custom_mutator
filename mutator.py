@@ -81,7 +81,7 @@ def test_serializing():
 
 
 def test_mutating():
-	fh = open("input.bin", "rb") # Read the file "input.bin"
+	fh = open("paska.txt", "rb") # Read the file "input.bin"
 	data = fh.read() # Read input data.
 	fh.close()
 
