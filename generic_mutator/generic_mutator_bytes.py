@@ -33,6 +33,7 @@ def add_character(string: bytes) -> str:
 def mutate_generic(string: bytes) -> str: # Mutate a string.
 
 	strat = random.randrange(3)
+	'''
 
 	match strat:
 		case 0:
@@ -47,6 +48,20 @@ def mutate_generic(string: bytes) -> str: # Mutate a string.
 		case _:
 			print("Invalid")
 			assert False
+	'''
+
+	if strat == 0:
+		# Remove substring
+		return remove_substring(string)
+	elif strat == 1:
+		return multiply_substring(string)
+	elif strat == 2:
+		return add_character(string)
+	else:
+		print("Invalid")
+		assert False
+
+
 	print("Invalid")
 	assert False
 

@@ -26,6 +26,8 @@ class APDUMsg:
 
 
 def bytes_or_nothing(thing): # Checks for None
+	if len(thing) == 0: # Maybe something like this????
+		return bytes([])
 	if thing == None or thing[0] == None:
 		return bytes([])
 	else:
