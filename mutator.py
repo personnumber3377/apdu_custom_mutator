@@ -39,7 +39,10 @@ def deinit():  # optional for Python
 	pass
 
 def fuzz_count(buf):
-	return 1_000 # Always fuzz 1000 times for the thing.
+	if try_parse_input(buf) != None: # The input is actually valid.
+		return 1000
+	else:
+		return 1 # Just fuzz once, because reasons...
 
 def test_serializing():
 	fh = open("input.bin", "rb") # Read the file "input.bin"
