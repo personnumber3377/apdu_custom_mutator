@@ -82,12 +82,12 @@ def test_mutating():
 	data = fh.read() # Read input data.
 	fh.close()
 
-	for _ in range(1000):
+	for i in range(1000):
 		fh = open("output.bin", "wb") # Read the file "input.bin"
 		fh.write(data) # Read input data.
 		fh.close()
 		data = mutate_contents(data)
-		#print("Mutated!")
+		print(i)
 	print("Mutated data: "+str(data))
 
 	print("test_mutating passed!!!")
