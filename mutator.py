@@ -27,7 +27,10 @@ def mutate_contents(databytes: bytes) -> bytes: # Mutates bytes
 	return thing # Return the final thing
 
 def fuzz(buf, add_buf, max_size):
-	return mutate_contents(buf)[:max_size] # Just do something like this
+	new_data = mutate_contents(buf)[:max_size]
+	if not isinstance(new_data, bytearray):
+		new_data = bytearray(new_data)
+	return new_data # Just do something like this
 
 def init(seed):
 	pass
