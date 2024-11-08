@@ -24,6 +24,18 @@ def mutate_contents(databytes: bytes) -> bytes: # Mutates bytes
 		thing += new_bytes_with_length # Add it to that.
 	return thing # Return the final thing
 
+def fuzz(buf, add_buf, max_size):
+	return mutate_contents(buf)[:max_size] # Just do something like this
+
+def init(seed):
+	pass
+
+def deinit():  # optional for Python
+	pass
+
+def fuzz_count(buf):
+	return 1_000 # Always fuzz 1000 times for the thing.
+
 def test_serializing():
 	fh = open("input.bin", "rb") # Read the file "input.bin"
 	data = fh.read() # Read input data.
