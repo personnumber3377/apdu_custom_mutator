@@ -7,7 +7,10 @@ from message_mutator import *
 
 TESTING = False
 
+ADD_BUF_CONTENTS = None
+
 def mutate_contents(databytes: bytes) -> bytes: # Mutates bytes
+	global ADD_BUF_CONTENTS
 	if len(databytes) == 0:
 		return bytes()
 	chunks = try_parse_input(databytes)
@@ -29,7 +32,7 @@ def mutate_contents(databytes: bytes) -> bytes: # Mutates bytes
 			continue # Skip adding invalid bullshit.
 		messages.append(msg) # Add that message thing.
 	# Ok, so now we have the messages in "messages". Select a mutation strategy and mutate.
-	mutate_messages(messages) # Mutate the message objects...
+	mutate_messages(messages, ADD_BUF_CONTENTS) # Mutate the message objects...
 	#for msg in messages:
 	#	#print("Checking...")
 	#	assert msg.CLA == 0x80 # Poopoo 
@@ -41,6 +44,10 @@ def mutate_contents(databytes: bytes) -> bytes: # Mutates bytes
 	return thing # Return the final thing
 
 def fuzz(buf, add_buf, max_size):
+	global ADD_BUF_CONTENTS
+	add_buf_chunks = try_parse_input(add_buf) # Try to parse the thing.
+	if add_buf_chunks != None: # The add_buf was parsed succesfully.
+		ADD_BUF_CONTENTS = add_buf_chunks # Just do something like this
 	new_data = mutate_contents(buf)[:max_size]
 	if not isinstance(new_data, bytearray):
 		new_data = bytearray(new_data)

@@ -128,7 +128,29 @@ def mutate_bc_advance(messages): # Mutates the bc_advance shit
 
 
 
-def mutate_messages(messages: list): # Mutates the messages in-place.
+def mutate_messages(messages: list, add_buf_chunks: list): # Mutates the messages in-place.
+
+
+
+	if random.randrange(3) == 1: # Try to do some bullshit thing.
+
+		other_messages = []
+		if add_buf_chunks != None:
+
+			for chunk in chunks:
+				msg = deserialize_to_obj(chunk)
+				if msg == None:
+					continue # Skip adding invalid bullshit.
+				other_messages.append(msg) # Add that message thing.
+
+			if len(other_messages) != 0: # Atleast one valid message in the other file
+				# Now we have the messages of the other file in other_messages . Select a random one and then add it to this data maybe???
+				rand_other_message = random.choice(other_messages)
+				# Now put it into the list.
+				messages.insert(random.randrange(len(messages)), rand_other_message)
+				# Now just return
+				return
+
 
 	# These next lines are for message specific mutations only.
 
