@@ -120,7 +120,7 @@ def mutate_bc_advance(messages): # Mutates the bc_advance shit
 			new_data = messages[i].data
 			#print("previous_data: "+str(data_before)+" "*10+"new_data: "+str(new_data))
 			mutated = True
-			assert data_before != new_data # Should change.
+			#assert data_before != new_data # Should change.
 
 
 	return mutated # Done

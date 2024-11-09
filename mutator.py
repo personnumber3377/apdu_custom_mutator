@@ -117,6 +117,6 @@ if __name__=="__main__":
 
 	print("You should use this with AFL or libfuzzer. When running standalone, this just runs some tests. See https://aflplus.plus/docs/custom_mutators/ for details.")
 
-	# test_serializing()
+	test_serializing()
 	test_mutating()
 	exit(0)
