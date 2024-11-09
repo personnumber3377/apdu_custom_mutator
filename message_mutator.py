@@ -137,7 +137,7 @@ def mutate_messages(messages: list, add_buf_chunks: list): # Mutates the message
 		other_messages = []
 		if add_buf_chunks != None:
 
-			for chunk in chunks:
+			for chunk in add_buf_chunks:
 				msg = deserialize_to_obj(chunk)
 				if msg == None:
 					continue # Skip adding invalid bullshit.
