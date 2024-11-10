@@ -115,8 +115,10 @@ def mutate_bc_advance(messages): # Mutates the bc_advance shit
 			data_before = copy.deepcopy(messages[i].data)
 			#print("Mutating the bc shit!!!"*10000)
 			#assert False
-			mutate_data_fixed_size(messages[i], data_size)
-
+			if isinstance(data_size, int):
+				mutate_data_fixed_size(messages[i], data_size)
+			else:
+				messages[i].data = mutate_generic(messages[i].data) # Just do something like this..
 			new_data = messages[i].data
 			#print("previous_data: "+str(data_before)+" "*10+"new_data: "+str(new_data))
 			mutated = True
