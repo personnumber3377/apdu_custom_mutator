@@ -165,6 +165,11 @@ def mutate_messages(messages: list, add_buf_chunks: list): # Mutates the message
 
 	# These rest are generic mutations strategies which can be used on any message.
 
+	if len(messages) == 0: # No messages to mutate. Just do some shit.
+		return [APDUMsg(0x80, 0x10, 0x10, bytes(b"aaaaaaaaaaaaaaaa"))] # This is just a safeguard.
+		# msg_obj = APDUMsg(CLA, CMD, OP, cmd_data)
+
+
 	mut_strat = random.randrange(6) # Generate a random integer from 0 to 5 inclusive.
 
 	if mut_strat == 0: # Mutate the data thing.
