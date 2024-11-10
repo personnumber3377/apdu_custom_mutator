@@ -147,7 +147,10 @@ def mutate_messages(messages: list, add_buf_chunks: list): # Mutates the message
 				# Now we have the messages of the other file in other_messages . Select a random one and then add it to this data maybe???
 				rand_other_message = random.choice(other_messages)
 				# Now put it into the list.
-				messages.insert(random.randrange(len(messages)), rand_other_message)
+				if len(messages) == 0:
+					messages.append(rand_other_message)
+				else:
+					messages.insert(random.randrange(len(messages)), rand_other_message)
 				# Now just return
 				return
 

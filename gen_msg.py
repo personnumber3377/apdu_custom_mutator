@@ -91,6 +91,30 @@ def serialize_messages(messages):
 def byte_seq(length):
 	return bytes([i for i in range(length)])
 
+def generate_btctx_message():
+	# This function generates a btctx style message...
+
+	# Now do the shit...
+
+	fh = open("oofshit/sample.bin", "rb")
+
+	total_data = fh.read()
+
+	fh.close()
+
+	#data1, data2 = total_data[:100], total_data[100:]
+	#assert len(data1) < 256 and len(data2) < 256
+	assert len(total_data) < 256
+
+	auth_btctx_msg1 = APDUMsg(0x80, ins.INS_SIGN, 0x02, total_data) # Just do some bullshit
+	#auth_btctx_msg2 = APDUMsg(0x80, ins.INS_SIGN, 0x02, data1)
+
+
+	return [auth_btctx_msg1]
+
+
+
+
 def gen_btc_trans():
 
 	# This is the start message
@@ -117,126 +141,11 @@ def gen_btc_trans():
 	# Now at this point we should trigger the authorized path thing...
 	messages.append(handle_path_msg) # Append this message to the messages...
 
-	# Now next up is the auth_sign_handle_btctx message.
-	# APDU_TOTAL_DATA_SIZE is basically the length of the handle_path_data thing..
-	auth_sign_handle_btctx_data = b"A"*len(handle_path_data)
-	# print("len(auth_sign_handle_btctx_data) == "+str(len(auth_sign_handle_btctx_data)))
-	# total_length = 82
-	total_length = 85 # Just some bullshit here..
-	thing = 0
-	# actual_data = b"\x00"*thing + b"\x60"*(total_length-thing)
 
-	actual_data = byte_seq(total_length)
+	some_bullshit_messages = generate_btctx_message()
 
-	actual_data = list(actual_data)
-
-	# the BTCTX_LENGTH_SIZE bytes is the length
-	# Then there is one byte which signifies the thing and then there are two bytes for extra data size, which in our case is zero.
-
-
-	actual_data[0] = 0xff # The length
-	actual_data[1] = 0xff
-	actual_data[2] = 0x00
-	actual_data[3] = 0x00
-	actual_data[4] = 0x00 # This is the thing.
-	actual_data[5] = 0x01 # Just set the extra data size to one. This can not be zero.
-	actual_data[6] = 0x00
-
-	# THis is the tx version shit. Set the tx version to zero for now..
-	actual_data[7] = 0x01
-	actual_data[8] = 0x00
-	actual_data[9] = 0x00
-	actual_data[10] = 0x00
-
-
-
-	# actual_data[len(actual_data) - 36] = 0xff # Maybe something like this..
-
-	# So the program starts at the index len(actual_data) - 36    shit..
-	# a914c664139327b98043febeab6434eba89bb196d1af87
-
-	program = list(bytes.fromhex("6060606060606060606060606060606060606060606060")) # This is just some program from somewhere...
-
-	print("length before: "+str(len(actual_data)))
-	actual_data[len(actual_data) - 36:(len(actual_data) - 36 + len(program))] = program
-	# program
-	print("length after: "+str(len(actual_data)))
-
-	# actual_data[-10] = 0x01 # Maybe something like this???
-	#actual_data[-3] = 0x01
-	#actual_data[-2] = 0x01
-	# Here is the btcscript shit:
-
-	# actual_data[11] = 0x61 # Maybe just something like this????
-
-	#actual_data[0] = 0 # the first byte is the COMPUTE_MODE (it is either zero aka SIGHASH_COMPUTE_MODE_LEGACY or 1 which is the other thing.)
-	
-	actual_data.pop(-1)
-	actual_data.pop(-1)
-	actual_data.pop(-1)
-
-
-	actual_data = bytes(actual_data)
-	
-
-
-	auth_sign_handle_btctx_msg = APDUMsg(0x80, ins.INS_SIGN, 0x02, actual_data) # 0x02 == P1_BTC shit...
-
-	# append to the messages...
-	messages.append(auth_sign_handle_btctx_msg)
-
-	poopoo = copy.deepcopy(actual_data)
-	actual_data = list(actual_data)
-	actual_data.pop(-1)
-	actual_data.pop(-1)
-	actual_data = bytes(actual_data)
-
-
-
-	st_operand_shit = bytes([0x00])*len(actual_data) # At this point we are in buf[i] in BTCSCRIPT_ST_OPERAND 
-
-	auth_sign_handle_btctx_msg2 = APDUMsg(0x80, ins.INS_SIGN, 0x02, st_operand_shit)
-
-
-
-	messages.append(auth_sign_handle_btctx_msg2)
-
-	new_msg_shit = copy.deepcopy(auth_sign_handle_btctx_msg2)
-
-
-	actual_data = new_msg_shit.data # Just get the data shit from there. Then do the thing....
-
-	actual_data = list(actual_data)
-
-	program = list(bytes.fromhex("a914c664139327b98043febeab6434eba89bb196d1af87")) # This is just some program from somewhere...
-
-	print("length before: "+str(len(actual_data)))
-	actual_data[len(actual_data) - 36:(len(actual_data) - 36 + len(program))] = program
-	actual_data = bytes(actual_data)
-	new_msg_shit.data = actual_data
-
-	messages.append(new_msg_shit)
-	# messages.append(auth_sign_handle_btctx_msg)
-
-	# Now is the time for the P1_RECEIPT phase...
-
-	'''
-
-	82
-	// Operation selectors
-	typedef enum {
-	    P1_PATH = 0x01,
-	    P1_BTC = 0x02,
-	    P1_RECEIPT = 0x04,
-	    P1_MERKLEPROOF = 0x08,
-	    P1_SUCCESS = 0x81,
-	} op_code_sign_t;
-
-	'''
-
-	# STATE_AUTH_RECEIPT
-
-
+	# messages.append(some_bullshit_message)
+	messages += some_bullshit_messages
 	auth_receipt_msg = APDUMsg(0x80, ins.INS_SIGN, 0x04, b"AAAAAAAAAA") # 0x04 == P1_RECEIPT
 
 	messages.append(auth_receipt_msg)
